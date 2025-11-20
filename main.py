@@ -10,34 +10,35 @@ import seaborn as sns
 # 1. DATASET LOADING + AUGMENTATION
 # ======================================
 
-data_dir = "dataset/"   # your dataset folder
+train_dir = "training/"   # training images by class subfolders
+test_dir = "testing/"     # testing images by class subfolders
 
 img_size = (128, 128)
 batch_size = 16
 
-datagen = ImageDataGenerator(
-    rescale=1./255,
-    validation_split=0.30,  # 70% train, 30% test
+train_datagen = ImageDataGenerator(
+    rescale=1.0 / 255,
     rotation_range=25,
     zoom_range=0.2,
-    horizontal_flip=True
+    horizontal_flip=True,
 )
 
-train_data = datagen.flow_from_directory(
-    data_dir,
+test_datagen = ImageDataGenerator(rescale=1.0 / 255)
+
+train_data = train_datagen.flow_from_directory(
+    train_dir,
     target_size=img_size,
     batch_size=batch_size,
     class_mode="sparse",   # multi-class labels
-    subset="training"
+    shuffle=True,
 )
 
-test_data = datagen.flow_from_directory(
-    data_dir,
+test_data = test_datagen.flow_from_directory(
+    test_dir,
     target_size=img_size,
     batch_size=batch_size,
     class_mode="sparse",
-    subset="validation",
-    shuffle=False
+    shuffle=False,
 )
 
 print("Class indices:", train_data.class_indices)
@@ -46,7 +47,7 @@ print("Class indices:", train_data.class_indices)
 # 2. BUILD CNN MODEL (MULTI-CLASS)
 # ======================================
 
-num_classes = 4  # flower, astronaut, guillotine, cube
+num_classes = len(train_data.class_indices)
 
 model = models.Sequential([
     layers.Conv2D(32, 3, activation='relu', input_shape=(128,128,3)),
