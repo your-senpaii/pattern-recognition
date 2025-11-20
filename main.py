@@ -16,7 +16,9 @@ train_datagen = ImageDataGenerator(
     rescale=1./255,
     rotation_range=25,
     zoom_range=0.2,
-    horizontal_flip=True
+    horizontal_flip=True,
+    width_shift_range=0.1,
+    height_shift_range=0.1
 )
 
 test_datagen = ImageDataGenerator(
@@ -46,18 +48,19 @@ print(f"Testing samples: {test_data.samples}")
 num_classes = len(train_data.class_indices) 
 
 model = models.Sequential([
-    layers.Conv2D(32, 3, activation='relu', input_shape=(128,128,3)),
-    layers.MaxPooling2D(),
-
-    layers.Conv2D(64, 3, activation='relu'),
-    layers.MaxPooling2D(),
-
-    layers.Conv2D(128, 3, activation='relu'),
-    layers.MaxPooling2D(),
-
+    layers.Conv2D(16, 3, activation='relu', input_shape=(128,128,3)),
+    layers.MaxPooling2D(2),
+    
+    layers.Conv2D(32, 3, activation='relu'),
+    layers.MaxPooling2D(2),
+    
+    layers.Conv2D(32, 3, activation='relu'),
+    layers.MaxPooling2D(2),
+    
     layers.Flatten(),
-    layers.Dense(128, activation='relu'),
-    layers.Dropout(0.3),
+    layers.Dropout(0.5),
+    layers.Dense(32, activation='relu'),
+    layers.Dropout(0.5),
     layers.Dense(num_classes, activation='softmax')
 ])
 
@@ -68,7 +71,7 @@ model.compile(
 )
 
 model.summary()
-epochs = 15
+epochs = 4
 
 history = model.fit(
     train_data,
@@ -125,10 +128,13 @@ class_names = list(train_data.class_indices.keys())
 
 sample_indices = []
 for class_idx in range(num_classes):
-    for i, label in enumerate(true_labels):
-        if label == class_idx:
-            sample_indices.append(i)
-            break
+    all_indices_for_class = np.where(true_labels == class_idx)[0]
+    
+    if len(all_indices_for_class) > 0:
+        random_index = np.random.choice(all_indices_for_class)
+        sample_indices.append(random_index)
+    else:
+        print(f"Warning: No samples found for class index {class_idx}")
 
 plt.figure(figsize=(20, 5))
 test_data.reset()
