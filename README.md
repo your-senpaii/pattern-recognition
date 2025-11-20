@@ -36,23 +36,15 @@ This project trains a convolutional neural network (CNN) to classify custom imag
    python -m pip install --upgrade pip
    python -m pip install -r requirements.txt
    ```
-4. **Prepare the dataset**:
-   - Put your training images into `training/<class_name>/`.
-   - Put your testing images into `testing/<class_name>/`.
-   - Folder names become the class labels (must match between training/testing).
-
-## Running the Training Script
 
 Activate the virtual environment (if not already active) and run:
 
 - **macOS / Linux**:
   ```bash
-  source .venv/bin/activate
   python main.py
   ```
 - **Windows (PowerShell)**:
   ```powershell
-  .\.venv\Scripts\Activate
   python main.py
   ```
 
